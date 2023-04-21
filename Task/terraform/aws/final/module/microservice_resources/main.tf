@@ -5,21 +5,23 @@ resource "aws_s3_bucket" "s3_bucket" {
   # acl    = "private"
 }
 
-resource "aws_s3_bucket_acl" "s3_bucket" {
-  bucket = aws_s3_bucket.s3_bucket.id
-  acl    = "private"
-}
+# resource "aws_s3_bucket_acl" "s3_bucket" {
+#   bucket = aws_s3_bucket.s3_bucket.id
+#   acl    = "private"
+# }
+
+
 
 resource "aws_db_instance" "rds_instance" {
-  identifier             = "${var.service_name}-rds-instance"
+  identifier             = "${var.service_name1}-rds-instance"
   engine                 = "mysql"
   instance_class         = "db.t2.micro"
   allocated_storage      = 10
   storage_type           = "gp2"
-  name                   = "${var.service_name}-rds"
+  name                   = "${var.service_name2}rds"
   username               = "root"
   password               = "password"
-  parameter_group_name   = "default.mysql5.7"
+  skip_final_snapshot    = true
 }
 
 resource "aws_iam_role" "iam_role" {
@@ -37,6 +39,7 @@ resource "aws_iam_role" "iam_role" {
     ]
   })
 }
+
 
 resource "aws_iam_policy" "iam_policy" {
   name        = "${var.service_name}-iam-policy"

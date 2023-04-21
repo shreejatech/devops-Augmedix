@@ -1,6 +1,8 @@
 module "microservice_resources" {
   source        = "../../module/microservice_resources"
-  service_name  = "customer-suggestion"
+  service_name  = "customersuggestion"
+  service_name1  = "customersuggestion"
+  service_name2  = "customerfsuggestion"
 }
 
 # output "rds_url" {
