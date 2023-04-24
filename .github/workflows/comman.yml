@@ -35,3 +35,18 @@ jobs:
         images: shindeds/webserver:latest
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+       
+       
+  load_test:
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        runner: [ubuntu-lates]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Sysbench
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sysbench
+        sysbench cpu --threads=2 --time=60 run     
+        
