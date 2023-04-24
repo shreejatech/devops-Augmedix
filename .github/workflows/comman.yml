@@ -1,4 +1,4 @@
-name: Build Webserver Container
+name: Run github workflow Scenario
 
 on:
   workflow_dispatch:
