@@ -50,3 +50,16 @@ jobs:
         sudo apt-get install -y sysbench
         sysbench cpu --threads=2 --time=60 run     
         
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for new version
+        run: |
+          docker pull nginx:latest
+          if [[ "$(docker images -q nginx:latest 2> /dev/null)" != "" ]]; then
+            echo "New version of nginx container available"
+            # BONUS: commit, push and create a pull request for the new tag
+          else
+            echo "No new version of nginx container available"
+          fi      
+        
