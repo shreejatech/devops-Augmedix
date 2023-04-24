@@ -1,37 +1,30 @@
-name: Check for Container Upgrade
-
+name: Check for Newer Version of Nginx Container
 on:
-  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
-
 jobs:
-  check_upgrade:
+  check-version:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout Code
-      uses: actions/checkout@v2
-    - name: Get Current Container Image Digest
-      id: get_current_digest
-      run: |
-        echo "::set-output name=digest::$(docker inspect username/webserver:latest --format='{{json .Id}}')"
-    - name: Get Latest Container Image Digest
-      id: get_latest_digest
-      run: |
-        docker pull username/webserver:latest
-        echo "::set-output name=digest::$(docker inspect username/webserver:latest --format='{{json .Id}}')"
-    - name: Compare Digests
-      id: compare_digests
-      run: |
-        echo "Current Digest: ${{ steps.get_current_digest.outputs.digest }}"
-        echo "Latest Digest: ${{ steps.get_latest_digest.outputs.digest }}"
-        if [[ "${{ steps.get_current_digest.outputs.digest }}" != "${{ steps.get_latest_digest.outputs.digest }}" ]]; then
-          echo "New container version detected."
-          echo "::set-output name=upgrade_available::true"
-        else
-          echo "No container upgrade available."
-          echo "::set-output name=upgrade_available::false"
-        fi
-    - name: Create Pull Request
-      if: steps.compare_digests.outputs.upgrade_available == 'true'
-      uses: peter-evans/create-pull-request@
+      - name: Check for newer version
+        id: check_version
+        run: |
+          current_version=$(docker inspect your-docker-username/your-image-name:latest --format='{{.Created}}')
+          latest_version=$(docker search your-docker-username/your-image-name --format='{{.CreatedAt}}' | head -n 1)
+          if [ "$current_version" != "$latest_version" ]; then
+            echo "::set-output name=upgrade::true"
+            echo "A newer version of the nginx container is available."
+          else
+            echo "::set-output name=upgrade::false"
+            echo "The nginx container is up to date."
+          fi
+      - name: Create Pull Request
+        if: steps.check_version.outputs.upgrade == 'true'
+        uses: peter-evans/create-pull-request@v3
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          commit-message: "Upgrade to the latest version of the nginx container"
+          title: "Upgrade to the latest version of the nginx container"
+          body: "There is a newer version of the nginx container available. Upgrading to the latest version."
+          branch: "upgrade-nginx-container"
+          base: "main"
