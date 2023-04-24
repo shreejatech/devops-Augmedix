@@ -1,42 +1,25 @@
+name: Build Webserver Container
 
- 
-
-name: Build Webserver Container with Top 10 List
 on:
-  workflow_dispatch:
   push:
-    branches:
-      - main
+    branches: [ main ]
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Build Docker image
-      run: docker build -t my-webserver .
-
-    - name: Push Docker image
-      uses: docker/login-action@v1
+    - uses: actions/checkout@v2
+    - name: Build Container
+      uses: docker/build-push-action@v2
       with:
-        registry: docker.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-      run: docker push my-webserver
-
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: Pull Docker image
-      uses: docker/login-action@v1
+        context: .
+        push: true
+        tags: username/webserver:latest
+      env:
+        TOP_10_FILE: ./top_10_list.html
+    - name: Publish Container
+      uses: docker/metadata-action@v3
       with:
-        registry: docker.io
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-      run: docker pull my-webserver
-
-    - name: Start container
-      run: docker run --name my-webserver-container -d -p 8080:80 -v "$(pwd)/top10.html:/usr/share/nginx/html/top10.html:ro" my-webserver
+        images: username/webserver:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
