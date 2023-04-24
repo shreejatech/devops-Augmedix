@@ -1,0 +1,84 @@
+# github workflows
+
+name: Build Webserver Container
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+
+      
+   
+    - uses: actions/checkout@v2
+    
+    - name: Log in to Docker Hub
+      uses: docker/login-action@65b78e6e13532edd9afa3aa52ac7964289d1a9c1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+          
+    
+    - name: Build Container
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: shindeds/webserver:latest 
+      env:
+        TOP_10_FILE: ./top_10_list.html
+    - name: Publish Container
+      uses: docker/metadata-action@v3
+      with:
+        images: shindeds/webserver:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+# Sysbench Load Test
+
+name: Sysbench Load Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  load_test:
+    runs-on: [ubuntu-latest]
+    strategy:
+      matrix:
+        runner: [ubuntu-lates]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Run Sysbench
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y sysbench
+        sysbench cpu --threads=2 --time=60 run
+
+
+# Check for new version of nginx container 
+
+name: Check for new version of nginx container
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for new version
+        run: |
+          docker pull nginx:latest
+          if [[ "$(docker images -q nginx:latest 2> /dev/null)" != "" ]]; then
+            echo "New version of nginx container available"
+            # BONUS: commit, push and create a pull request for the new tag
+          else
+            echo "No new version of nginx container available"
+          fi                
