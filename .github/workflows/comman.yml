@@ -30,8 +30,7 @@ jobs:
         context: .
         push: true
         tags: shindeds/webserver:latest 
-#       env:
-#         TOP_10_FILE: ./top_10_list.html
+
     - name: Publish Container
       uses: docker/metadata-action@v3
       with:
