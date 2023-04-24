@@ -1,5 +1,6 @@
 name: Run github workflow Scenario
 
+# Basic webserver container build
 on:
   workflow_dispatch:
   schedule:
@@ -38,7 +39,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
        
-       
+  # Manual sysbench test with 2 runners     
   load_test:
     runs-on: [ubuntu-latest]
     strategy:
@@ -51,7 +52,8 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y sysbench
         sysbench cpu --threads=2 --time=60 run     
-        
+  
+  # Scheduled workflow to check for newer version of webserver container
   check-version:
     runs-on: ubuntu-latest
     steps:
