@@ -5,10 +5,10 @@ on:
 
 jobs:
   load_test:
-    runs-on: [ubuntu-latest, macos-latest]
+    runs-on: [ubuntu-latest]
     strategy:
       matrix:
-        runner: [ubuntu-latest, macos-latest]
+        runner: [ubuntu-lates]
     steps:
     - uses: actions/checkout@v2
     - name: Run Sysbench
