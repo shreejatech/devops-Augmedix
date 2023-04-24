@@ -1,31 +1,15 @@
-name: Check for Newer Version of Nginx Container
+
+name: Check for Newer Version of Webserver Container
 on:
-  workflow_dispatch:
+  workflow_dispatch: 
   schedule:
     - cron: '0 0 * * *'
+
 jobs:
-  check-version:
+  check:
     runs-on: ubuntu-latest
     steps:
-      - name: Check for newer version
-        id: check_version
-        run: |
-          current_version=$(docker inspect your-docker-username/your-image-name:latest --format='{{.Created}}')
-          latest_version=$(docker search your-docker-username/your-image-name --format='{{.CreatedAt}}' | head -n 1)
-          if [ "$current_version" != "$latest_version" ]; then
-            echo "::set-output name=upgrade::true"
-            echo "A newer version of the nginx container is available."
-          else
-            echo "::set-output name=upgrade::false"
-            echo "The nginx container is up to date."
-          fi
-      - name: Create Pull Request
-        if: steps.check_version.outputs.upgrade == 'true'
-        uses: peter-evans/create-pull-request@v3
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          commit-message: "Upgrade to the latest version of the nginx container"
-          title: "Upgrade to the latest version of the nginx container"
-          body: "There is a newer version of the nginx container available. Upgrading to the latest version."
-          branch: "upgrade-nginx-container"
-          base: "main"
+    - name: Check for newer version
+      run: |
+        current=$(docker image ls my-webserver --format '{{.Tag}}')
+        latest=$(curl -s https://registry.hub.docker.com/v1/repositories/library/nginx/tags | jq -r '."name" | select(. != null)' | sort -rV
