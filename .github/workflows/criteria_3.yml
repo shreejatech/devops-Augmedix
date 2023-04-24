@@ -1,15 +1,20 @@
+name: Check for new version of nginx container
 
-name: Check for Newer Version of Webserver Container
 on:
-  workflow_dispatch: 
+  workflow_dispatch:
   schedule:
     - cron: '0 0 * * *'
 
 jobs:
-  check:
+  check-version:
     runs-on: ubuntu-latest
     steps:
-    - name: Check for newer version
-      run: |
-        current=$(docker image ls my-webserver --format '{{.Tag}}')
-        latest=$(curl -s https://registry.hub.docker.com/v1/repositories/library/nginx/tags | jq -r '."name" | select(. != null)' | sort -rV
+      - name: Check for new version
+        run: |
+          docker pull nginx:latest
+          if [[ "$(docker images -q nginx:latest 2> /dev/null)" != "" ]]; then
+            echo "New version of nginx container available"
+            # BONUS: commit, push and create a pull request for the new tag
+          else
+            echo "No new version of nginx container available"
+          fi
