@@ -1,0 +1,25 @@
+name: Build Webserver Container
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build Container
+      uses: docker/build-push-action@v2
+      with:
+        context: .
+        push: true
+        tags: username/webserver:latest
+      env:
+        TOP_10_FILE: ./top_10_list.html
+    - name: Publish Container
+      uses: docker/metadata-action@v3
+      with:
+        images: username/webserver:latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
