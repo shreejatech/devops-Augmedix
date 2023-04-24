@@ -3,6 +3,7 @@
 
 name: Build Webserver Container with Top 10 List
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
